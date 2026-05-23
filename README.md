@@ -1,6 +1,6 @@
 # Multimodal (Görüntü + Metin) E-Ticaret Ürün Sınıflandırması 🚀
 
-[![nbviewer](https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.svg)](https://nbviewer.org/github/tugbaert/Hybrid-YSA-Fashion-Classification/blob/main/hibrit_ysa_model_gelistirme.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tugbaert/Hybrid-YSA-Fashion-Classification/blob/main/hibrit_ysa_model_gelistirme.ipynb)
 
 Bu proje, e-ticaret platformlarındaki ürünleri sadece görsellerine veya sadece isimlerine bakarak değil, **her iki veri tipini aynı anda (Multimodal) işleyerek** doğru ana kategoriye atayan bir Yapay Sinir Ağı (YSA) projesidir.
 
