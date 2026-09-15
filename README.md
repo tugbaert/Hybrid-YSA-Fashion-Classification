@@ -2,36 +2,30 @@
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tugbaert/Hybrid-YSA-Fashion-Classification/blob/main/hibrit_ysa_model_gelistirme.ipynb)
 
-Bu proje, e-ticaret platformlarındaki ürünleri sadece görsellerine veya sadece isimlerine bakarak değil, **her iki veri tipini aynı anda (Multimodal) işleyerek** doğru ana kategoriye atayan bir Yapay Sinir Ağı (YSA) projesidir.
+Bu proje, e-ticaret platformlarındaki ürünleri sadece görsellerine veya sadece isimlerine bakarak değil, **her iki veri tipini aynı anda (Multimodal) işleyerek** ana kategoriye atayan bir Yapay Sinir Ağı (YSA) projesidir.
 
 ## 📌 Proje Özeti
-Sınıflandırma problemlerinde tek bir veri tipi bazen yetersiz kalabilir. Örneğin, beyaz bir tişört ile beyaz bir havlu sadece görsel olarak analiz edildiğinde karışabilir. Veya "Free Items" (Bedava Ürün) gibi promosyonel metin etiketleri, ürünün fiziksel gerçekliğini gizleyebilir. Bu projede, bu tarz zorlukları aşmak için Geç Özellik Birleştirme (Late Feature Fusion) stratejisi kullanılmıştır.
-
-* **Veri Seti:** Kaggle - [Fashion Product Images (Small)](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small)
-* **Modaliteler:** 128x128x3 RGB Görüntü + Maksimum 10 kelimelik Ürün İsmi
-* **Sınıf Sayısı:** 6 Ana Kategori (Apparel, Accessories, Footwear, Personal Care, Free Items, Sporting Goods)
-
-## 🧠 Mimari Yaklaşım ve Modeller
-Kontrollü bir deney ortamı yaratmak için projede 4 farklı aşamadan geçilmiştir:
-
-1. **Baseline Model (Sadece Görüntü):** Tek katmanlı basit 2D Evrişim (CNN).
-2. **Model-1 (Sadece Metin):** Çift yönlü ardışık anlamsal analiz yapan BiLSTM ağı.
-3. **Model-2 (Sadece Görüntü):** Transfer Learning kullanılarak ImageNet ağırlıklarıyla dondurulmuş MobileNetV2.
-4. **Hibrit Model (Görüntü + Metin):** MobileNetV2'den gelen 64 boyutlu uzamsal vektör ile BiLSTM'den gelen 64 boyutlu anlamsal vektörün uç uca eklendiği (Concatenate) çok girişli (Multi-Input) yapı.
+Sınıflandırma problemlerinde tek bir veri tipi bazen yetersiz kalabilir. Bu projede; görsel verilerin (CNN/MobileNetV2) ve metin verilerinin (BiLSTM) birbirinin zayıflıklarını örtmesi amacıyla Geç Özellik Birleştirme (Late Feature Fusion) stratejisi ile çok girişli (multi-input) gerçek bir hibrit yapı tasarlanmıştır.
 
 ## 📊 Karşılaştırmalı Sonuçlar
-Projede sınıf dengesizliği bulunduğu için ana metrik olarak **Macro F1-Score** kullanılmıştır.
+*Not: Sınıf dengesizliği nedeniyle temel metrik olarak Macro F1-Score kullanılmıştır. Test ve Validation metrikleri net olarak ayrıştırılmıştır.*
 
-| Model Türü | Kullanılan Veri | Test Accuracy | Test Macro F1 |
-| :--- | :--- | :--- | :--- |
-| Baseline (CNN) | Sadece Görüntü | % 95.40 | % 62.03 |
-| Model-1 (BiLSTM) | Sadece Metin | % 99.47 | % 66.28 |
-| Model-2 (MobileNetV2)| Sadece Görüntü | % 98.20 | % 64.97 |
-| **Hibrit Model** | **Görüntü + Metin** | **% 99.20** | **% 65.96** |
+| Model Türü | Veri Tipi | Val Accuracy | Test Accuracy | Val Macro F1 | Test Macro F1 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Baseline (CNN) | Sadece Görüntü | % 93.73 | % 95.40 | % 60.15 | % 62.03 |
+| **Model-1 (BiLSTM)** | **Sadece Metin** | % 98.90 | **% 99.47** | % 65.80 | **% 66.28** |
+| Model-2 (MobileNetV2)| Sadece Görüntü | % 97.50 | % 98.20 | % 63.45 | % 64.97 |
+| Hibrit Model (Var.3) | Görüntü + Metin | **% 99.10** | % 99.20 | % 64.90 | % 65.96 |
 
-## 🔍 Hata Analizi ve Modelin Gücü
-Model test setinde 1500 örnekten 1489'unu doğru bilerek %99 doğruluğa ulaşmıştır. Ancak hibrit yapının asıl gücü yapılan Hata Analizinde ortaya çıkmıştır:
-Veri setinde "Free Items" (Bedava Ürünler) olarak hatalı veya ticari amaçla etiketlenmiş sırt çantası ve ruj gibi ürünler, hibrit model tarafından fiziksel gerçekliğe uygun biçimde "Aksesuar" ve "Kişisel Bakım" olarak düzeltilmiştir. Model örüntüleri ezberlememiş, etiket gürültüsünü aşabilen bir genelleme kapasitesine ulaşmıştır.
+## 🎯 Mimari Tercih Savunması: Neden Hibrit Model?
+Tabloda görüldüğü üzere, salt metin işleyen **BiLSTM modeli (%66.28)**, sayısal Macro F1 skorunda Hibrit modeli (%65.96) geçmiştir. Bu durum, e-ticaret verilerinde ürün isimlerinin çok güçlü bir ayırt edici olduğunu göstermektedir. 
+
+Ancak nihai mimari olarak **Çok Girişli Hibrit Model** savunulmaktadır. Bunun nedeni sayısal liderlik değil, **kavramsal esneklik ve sınır durum (edge-case) yönetimidir.** Hata analizinde kanıtlandığı üzere hibrit model; "Free Items" (Bedava Ürün) olarak etiketlenmiş çanta ve ruj gibi ürünlerde metin etiketindeki ticari gürültüyü aşarak, görsel verinin yardımıyla fiziksel gerçekliğe uygun (Aksesuar ve Kişisel Bakım) kararlar verebilmektedir. 
+
+## ⚠️ Sınırlılıklar ve Sıfır Başarı Vakası
+Bu projedeki mimari başarı, veri setinin yapısal problemleri nedeniyle belirli sınırlara takılmıştır:
+1. **Azınlık Sınıflarında Çöküş:** Sınıflar arası şiddetli dengesizlik nedeniyle model, "Free Items" ve "Sporting Goods" gibi ekstrem azınlık sınıflarında tamamen başarısız olmuş ve bu sınıflar için **F1 = 0.00** skoru üretmiştir.
+2. **Veri Çoğaltma (Augmentation) Eksikliği:** Eğitim sürecinde sistematik bir Data Augmentation veya sentetik veri üretme tekniği uygulanmamıştır. Model sadece ham verinin mevcut dağılımı üzerinden eğitilmiştir.
 
 ## 🛠️ Kullanılan Teknolojiler
 * Python, TensorFlow, Keras Functional API
